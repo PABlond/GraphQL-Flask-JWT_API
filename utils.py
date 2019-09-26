@@ -16,7 +16,7 @@ def encode(user):
 
 
 def decode(token):
-    try:        
+    try:
         return jwt.decode(token, JWT_SECRET, algorithm='HS256')
     except:
         return {}
