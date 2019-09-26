@@ -1,38 +1,36 @@
-
 from graphene import ObjectType, String, Boolean, Schema
 from flask_graphql import GraphQLView
 from db import Users
-from utils import encode
+from utils import encode, decode, encrypt_password, decrypt_password
+
 
 class Query(ObjectType):
-    # this defines a Field `hello` in our Schema with a single Argument `name`
-    hello = String(name=String(default_value="stranger"))
-    goodbye = String()
     login = String(email=String(), password=String())
     signup = String(email=String(), password=String())
 
-    # our Resolver method takes the GraphQL context (root, info) as well as
-    # Argument (name) for the Field and returns data for the query Response
-    def resolve_hello(root, info, name):
-        return f'Hello {name}!'
-
-    def resolve_goodbye(root, info):
-        return 'See ya!'
-    
     def resolve_login(root, info, email, password):
-        print(email, password)
-        return 'true'
-    
+        user = Users.find_one({"email": email})
+        if user:
+            if decrypt_password(password, user['password']):
+                token = encode(user={"email": email})
+                return token
+            else:
+                return "Password incorrect"
+        else:
+            return 'User not found'
+
     def resolve_signup(root, info, email, password):
-        # print(email, password)
-        user = {'email': email, 'password': password}
-        is_user_exist = Users.find_one(user)
+        user = {
+            'email': email,
+            'password': encrypt_password(password=password)
+        }
+        is_user_exist = Users.find_one({email: user['email']})
         print(is_user_exist)
         if is_user_exist:
             return "User already exists"
-        else: 
+        else:
             Users.insert_one(user)
-            token = encode(user = {"email": email})
+            token = encode(user={"email": email})
             return token
 
 
