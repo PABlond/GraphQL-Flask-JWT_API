@@ -2,13 +2,14 @@
 from graphene import ObjectType, String, Boolean, Schema
 from flask_graphql import GraphQLView
 from db import Users
+from utils import encode
 
 class Query(ObjectType):
     # this defines a Field `hello` in our Schema with a single Argument `name`
     hello = String(name=String(default_value="stranger"))
     goodbye = String()
     login = String(email=String(), password=String())
-    signup = Boolean(email=String(), password=String())
+    signup = String(email=String(), password=String())
 
     # our Resolver method takes the GraphQL context (root, info) as well as
     # Argument (name) for the Field and returns data for the query Response
@@ -28,10 +29,11 @@ class Query(ObjectType):
         is_user_exist = Users.find_one(user)
         print(is_user_exist)
         if is_user_exist:
-            return False
+            return "User already exists"
         else: 
             Users.insert_one(user)
-            return True
+            token = encode(user = {"email": email})
+            return token
 
 
 view_func = GraphQLView.as_view("/graphql", schema=Schema(query=Query))
