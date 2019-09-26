@@ -1,15 +1,16 @@
 import jwt
 import bcrypt
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 JWT_SECRET = os.environ.get("JWT_SECRET")
 
 
 def encode(user):
+    print(datetime.utcnow())
     return jwt.encode({
         "email": user['email'],
-        'exp': datetime.utcnow()
+        'exp': datetime.utcnow() + timedelta(hours=1)
     },
                       JWT_SECRET,
                       algorithm='HS256').decode("utf-8")
