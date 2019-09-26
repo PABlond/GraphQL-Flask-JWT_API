@@ -16,4 +16,4 @@ app.add_url_rule("/graphql", view_func=view_func)
 #     return "online_users"
 
 if __name__ == "__main__":
-    app.run()
+    app.run() 

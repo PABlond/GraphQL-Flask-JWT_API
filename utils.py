@@ -1,12 +1,18 @@
 import jwt
 import bcrypt
 import os
+from datetime import datetime
 
 JWT_SECRET = os.environ.get("JWT_SECRET")
 
 
 def encode(user):
-    return jwt.encode(user, JWT_SECRET, algorithm='HS256').decode("utf-8")
+    return jwt.encode({
+        "email": user['email'],
+        'exp': datetime.utcnow()
+    },
+                      JWT_SECRET,
+                      algorithm='HS256').decode("utf-8")
 
 
 def decode(token):
