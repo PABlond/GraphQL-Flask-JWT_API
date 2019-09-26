@@ -7,7 +7,6 @@ JWT_SECRET = os.environ.get("JWT_SECRET")
 
 
 def encode(user):
-    print(datetime.utcnow())
     return jwt.encode({
         "email": user['email'],
         'exp': datetime.utcnow() + timedelta(hours=1)
@@ -17,7 +16,10 @@ def encode(user):
 
 
 def decode(token):
-    return jwt.decode(token, JWT_SECRET, algorithm='HS256')
+    try:        
+        return jwt.decode(token, JWT_SECRET, algorithm='HS256')
+    except:
+        return {}
 
 
 def encrypt_password(password):
