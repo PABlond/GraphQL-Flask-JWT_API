@@ -23,7 +23,7 @@ class Query(ObjectType):
     user = Field(User, required=True, token=String(required=True))
 
     def resolve_login(root, info, email, password):
-        user = Users.find_one({"email": email})
+        user = Users.find_one({"email": email.lower()})
         if user:
             if decrypt_password(password=password,
                                 hashed_password=user['password']):
@@ -34,17 +34,16 @@ class Query(ObjectType):
             raise Exception('User not found')
 
     def resolve_signup(root, info, email, password):
-        if Users.find_one({email: email}):
+        if Users.find_one({email: email.lower()}):
             raise Exception("User already exists")
         else:
             user = {
-                'email': email,
+                'email': email.lower(),
                 'password': encrypt_password(password=password),
                 "is_check": False
             }
             _id = Users.insert_one(user)
             user['_id'] = _id.inserted_id
-            print(user)
             return user
 
     def resolve_user(root, info, token):
