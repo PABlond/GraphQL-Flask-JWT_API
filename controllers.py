@@ -16,13 +16,13 @@ class Query(ObjectType):
                                 hashed_password=user['password']):
                 return encode(user={"email": email})
             else:
-                return "Password incorrect"
+                raise Exception("Password incorrect")
         else:
-            return 'User not found'
+            raise Exception('User not found')
 
     def resolve_signup(root, info, email, password):
         if Users.find_one({email: email}):
-            return "User already exists"
+            raise Exception("User already exists")
         else:
             Users.insert_one({
                 'email': email,
@@ -39,9 +39,9 @@ class Query(ObjectType):
             if user:
                 return encode(user={"email": email})
             else:
-                return "User not found"
+                raise Exception("User not found")
         else:
-            return "Invalid token"
+            raise Exception("Invalid token")
 
 
 view_func = GraphQLView.as_view("/graphql", schema=Schema(query=Query))
