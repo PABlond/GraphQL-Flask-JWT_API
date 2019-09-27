@@ -1,19 +1,17 @@
 from flask import Flask, escape, request
 from flask_pymongo import PyMongo
-from resolvers import view_func
 from dotenv import load_dotenv
+from flask_graphql import GraphQLView
+from graphene import Schema
+from resolvers import Query
 
 load_dotenv()
 
 app = Flask(__name__)
 
-app.add_url_rule("/graphql", view_func=view_func)
+view_func = GraphQLView.as_view("/graphql", schema=Schema(query=Query))
 
-# @app.route("/")
-# def home_page():
-#     online_users = mongo.db.users.find_one({"online": True})
-#     print(online_users)
-#     return "online_users"
+app.add_url_rule("/graphql", view_func=view_func)
 
 if __name__ == "__main__":
     app.run() 

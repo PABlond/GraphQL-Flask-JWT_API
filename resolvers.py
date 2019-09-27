@@ -1,26 +1,11 @@
-from graphene import ObjectType, String, Boolean, ID, Schema, Field, Interface
-from flask_graphql import GraphQLView
-from db import Users
-from utils import encode, decode, encrypt_password, decrypt_password
-
-
-class User(ObjectType):
-    _id = String(required=True)
-    email = String(required=True)
-    isCheck = Boolean(required=True)
-    token = String()
-
-    def resolve_isCheck(root, info):
-        return root['is_check']
-
-    def resolve_token(root, info):
-        return encode(user={"email": root['email']})
+from graphene import ObjectType, String, Boolean, ID, Field, Interface
+from config.db import Users
+from services.utils import encode, decode, encrypt_password, decrypt_password
+from schemas.schemas import User, query_auth_schemas
 
 
 class Query(ObjectType):
-    login = Field(User, email=String(), password=String())
-    signup = Field(User, email=String(), password=String())
-    user = Field(User, required=True, token=String(required=True))
+    (login, signup, user) = query_auth_schemas()
 
     def resolve_login(root, info, email, password):
         user = Users.find_one({"email": email.lower()})
@@ -34,7 +19,7 @@ class Query(ObjectType):
             raise Exception('User not found')
 
     def resolve_signup(root, info, email, password):
-        if Users.find_one({email: email.lower()}):
+        if Users.find_one({"email": email.lower()}):
             raise Exception("User already exists")
         else:
             user = {
@@ -56,6 +41,3 @@ class Query(ObjectType):
                 raise Exception("User not found")
         else:
             raise Exception("Invalid token")
-
-
-view_func = GraphQLView.as_view("/graphql", schema=Schema(query=Query))
