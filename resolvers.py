@@ -6,7 +6,7 @@ import uuid
 
 
 class Query(ObjectType):
-    (login, signup, user) = query_auth_schemas()
+    (login, signup, user, userConfirm) = query_auth_schemas()
 
     def resolve_login(root, info, email, password):
         user = Users.find_one({"email": email.lower()})
@@ -50,3 +50,15 @@ class Query(ObjectType):
                 raise Exception("User not found")
         else:
             raise Exception("Invalid token")
+
+    def resolve_userConfirm(root, info, uniqid, email):
+        user = Users.find_one({"email": email.lower()})
+        if user:
+            if (uniqid == user['is_check']['id']):
+                Users.update_one({"email": email.lower()}, {'$set': {"is_check": {"status": True, "id": ""}}})
+                return True
+            else:
+                raise Exception("Link is not correct")
+        else:
+            raise Exception("User not found")
+        
