@@ -76,6 +76,7 @@ class Query(ObjectType):
             if not is_check['status'] and is_check['id']:
                 send_confirmation(receiver_address=email,
                                   checking_id=is_check['id'])
+                return True
             else:
                 raise Exception("User is already confirmed")
         else:
