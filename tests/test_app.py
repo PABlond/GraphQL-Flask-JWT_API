@@ -63,4 +63,23 @@ def test_login_no_user():
 
     assert len(r.json()['errors']) == 1
     assert r.json()['errors'][0]['message'] == "User not found"
-    
+
+
+def test_user_success():
+    query_user = "{login(email:\"john.doe@sample.net\", password: \"123\") {email, token}}"
+    r = requests.get("{}/graphql?query={}".format(
+        url, urllib.parse.quote(query_user)))
+    token = r.json()['data']['login']['token']
+
+    query = "{user(token: \"" + token + "\") { token }}"
+    r = requests.get("{}/graphql?query={}".format(url,
+                                                  urllib.parse.quote(query)))
+    assert r.status_code == 200
+
+
+def test_user_wrong_token():
+    query = "{user(token: \"" + randomString(50) + "\") { token }}"
+    r = requests.get("{}/graphql?query={}".format(url,
+                                                  urllib.parse.quote(query)))
+    assert len(r.json()['errors']) == 1
+    assert r.json()['errors'][0]['message'] == "Invalid token"
