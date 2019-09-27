@@ -11,7 +11,7 @@ class User(ObjectType):
     token = String()
 
     def resolve_isCheck(root, info):
-        return root['is_check']
+        return root['is_check']['status']
 
     def resolve_token(root, info):
         return encode(user={"email": root['email']})

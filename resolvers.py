@@ -1,7 +1,8 @@
 from graphene import ObjectType, String, Boolean, ID, Field, Interface
 from config.db import Users
-from services.utils import encode, decode, encrypt_password, decrypt_password
+from services.utils import encode, decode, encrypt_password, decrypt_password, send_confirmation
 from schemas.schemas import User, query_auth_schemas
+import uuid
 
 
 class Query(ObjectType):
@@ -23,13 +24,18 @@ class Query(ObjectType):
         if Users.find_one({"email": email.lower()}):
             raise Exception("User already exists")
         else:
+            id = str(uuid.uuid1())
             user = {
                 'email': email.lower(),
                 'password': encrypt_password(password=password),
                 "firstname": firstname,
                 "lastname": lastname,
-                "is_check": False
+                "is_check": {
+                    "status": False,
+                    "id": id
+                },
             }
+            send_confirmation(receiver_address=email, checking_id=id)
             _id = Users.insert_one(user)
             user['_id'] = _id.inserted_id
             return user
