@@ -38,6 +38,10 @@ Then, you can request the API as follows:
 }
 ```
 
+example of login authentication : 
+
+[{login(email:"john.doe@sample.net", password: "123") {email, token}}](https://graphql-flask-jwt-api.herokuapp.com/graphql?query={login(email:"john.doe@sample.net",%20password:%20"123")%20{email,%20token}})
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
