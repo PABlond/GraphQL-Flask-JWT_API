@@ -1,10 +1,10 @@
 # GraphQL-Flask-JWT_API
 
-This repository is a boilerplate for dealing with JWT authentication using Flask, GraphQL and MongoDB.
+This repository is a boilerplate to deal with JWT authentication using Flask, GraphQL and MongoDB.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to needed librairies.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install needed librairies.
 
 ```bash
 pip install -r requirements.txt
@@ -33,7 +33,7 @@ Then, you can request the API as follows:
     user(token: <TOKEN>) {
         _id
         email
-        token # A new token with a new expiration date
+        token # A new token is requested with a new expiration date
     }
 }
 ```
