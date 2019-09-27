@@ -7,5 +7,4 @@ DB_PASSWORD = os.environ.get("DB_PASSWORD")
 
 uri = "mongodb://{}:{}@{}".format(DB_USERNAME, DB_PASSWORD, DB_URL)
 mongo = MongoClient(uri, retryWrites=False)
-
 Users = mongo['python_jwt'].users
