@@ -18,13 +18,16 @@ class Query(ObjectType):
         else:
             raise Exception('User not found')
 
-    def resolve_signup(root, info, email, password):
+    def resolve_signup(root, info, email, password, firstname, lastname):
+        print(email, password, firstname, lastname)
         if Users.find_one({"email": email.lower()}):
             raise Exception("User already exists")
         else:
             user = {
                 'email': email.lower(),
                 'password': encrypt_password(password=password),
+                "firstname": firstname,
+                "lastname": lastname,
                 "is_check": False
             }
             _id = Users.insert_one(user)

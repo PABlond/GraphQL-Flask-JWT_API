@@ -5,6 +5,8 @@ from services.utils import encode
 class User(ObjectType):
     _id = String(required=True)
     email = String(required=True)
+    firstname = String()
+    lastname = String()
     isCheck = Boolean(required=True)
     token = String()
 
