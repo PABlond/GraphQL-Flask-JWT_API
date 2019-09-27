@@ -1,6 +1,6 @@
 from flask import Flask, escape, request
 from flask_pymongo import PyMongo
-from controllers import view_func
+from resolvers import view_func
 from dotenv import load_dotenv
 
 load_dotenv()
