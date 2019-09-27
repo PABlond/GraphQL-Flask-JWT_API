@@ -13,7 +13,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-env FLASK_APP=app.py FLASK_DEBUG=1 flask run
+env FLASK_APP=main.py flask run
 ```
 
 Then, you can request the API as follows:
