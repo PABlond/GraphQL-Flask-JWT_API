@@ -6,7 +6,7 @@ import uuid
 
 
 class Query(ObjectType):
-    (login, signup, user, userConfirm) = query_auth_schemas()
+    (login, signup, user, userConfirm, confirmResend) = query_auth_schemas()
 
     def resolve_login(root, info, email, password):
         user = Users.find_one({"email": email.lower()})
@@ -55,10 +55,28 @@ class Query(ObjectType):
         user = Users.find_one({"email": email.lower()})
         if user:
             if (uniqid == user['is_check']['id']):
-                Users.update_one({"email": email.lower()}, {'$set': {"is_check": {"status": True, "id": ""}}})
+                Users.update_one(
+                    {"email": email.lower()},
+                    {'$set': {
+                        "is_check": {
+                            "status": True,
+                            "id": ""
+                        }
+                    }})
                 return True
             else:
                 raise Exception("Link is not correct")
         else:
             raise Exception("User not found")
-        
+
+    def resolve_confirmResend(root, info, email):
+        user = Users.find_one({"email": email.lower()})
+        if user:
+            is_check = user['is_check']
+            if not is_check['status'] and is_check['id']:
+                send_confirmation(receiver_address=email,
+                                  checking_id=is_check['id'])
+            else:
+                raise Exception("User is already confirmed")
+        else:
+            raise Exception("User not found")
