@@ -20,7 +20,7 @@ Then, you can request the API as follows:
 
 ```GraphQL
 {
-    signup(email: <EMAIL>, password: <PASSWORD>) {
+    signup(email: <EMAIL>, password: <PASSWORD>, firstname: <FIRSTNAME>, lastname: <LASTNAME>) {
         _id
         email
         token
