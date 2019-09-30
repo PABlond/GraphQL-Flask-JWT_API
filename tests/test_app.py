@@ -3,6 +3,7 @@ import urllib.parse
 import random
 import string
 from db import Users
+from utils import signup, delete_user, url
 
 
 def randomString(stringLength=10):
@@ -11,7 +12,6 @@ def randomString(stringLength=10):
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
-url = "http://localhost:5000"
 email = randomString(50)
 
 
@@ -22,15 +22,12 @@ def test_root_endpoint():
 
 
 def test_signup_success():
-    query = "{signup(email: \"" + email + "\", password: \"123\") {email, token}}"
-    r = requests.get("{}/graphql?query={}".format(url,
-                                                  urllib.parse.quote(query)))
-
+    r = signup(email)
     assert r.status_code == 200
 
 
 def test_signup_exists():
-    query = "{signup(email: \"john.doe@sample.net\", password: \"123\") {email, token}}"
+    query = "{signup(email: \"john.doe@sample.net\", password: \"123\", firstname:\"firstname\", lastname:\"lastname\") {email, token}}"
     r = requests.get("{}/graphql?query={}".format(url,
                                                   urllib.parse.quote(query)))
 
@@ -43,7 +40,7 @@ def test_login_success():
     r = requests.get("{}/graphql?query={}".format(url,
                                                   urllib.parse.quote(query)))
 
-    Users.delete_one({"email": email})
+    delete_user(email)
     assert r.status_code == 200
 
 
@@ -83,3 +80,27 @@ def test_user_wrong_token():
                                                   urllib.parse.quote(query)))
     assert len(r.json()['errors']) == 1
     assert r.json()['errors'][0]['message'] == "Invalid token"
+
+
+def test_confirmResend_not_found():
+    fake_email = randomString(50)
+    query = "{confirmResend(email: \"" + fake_email + "\")}"
+    r = requests.get("{}/graphql?query={}".format(url,
+                                                  urllib.parse.quote(query)))
+    assert len(r.json()['errors']) == 1
+    assert r.json()['errors'][0]['message'] == "User not found"
+
+
+def test_confirmResend_already_confirmed():
+    fake_email = "john.doe@sample.net"
+    query = "{confirmResend(email: \"" + fake_email + "\")}"
+    r = requests.get("{}/graphql?query={}".format(url,
+                                                  urllib.parse.quote(query)))
+    assert len(r.json()['errors']) == 1
+    assert r.json()['errors'][0]['message'] == "User is already confirmed"
+
+
+def test_confirmResend_success():
+    r = signup(email)
+    assert r.status_code == 200
+    delete_user(email)
