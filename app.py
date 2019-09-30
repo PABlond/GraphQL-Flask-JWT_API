@@ -5,15 +5,6 @@ from flask_graphql import GraphQLView
 from graphene import Schema
 from resolvers import Query
 from flask_cors import CORS
-import schedule
-import time
-
-
-def job():
-    print("I'm working...")
-
-
-schedule.every(5).minutes.do(job)
 
 load_dotenv()
 
@@ -29,10 +20,6 @@ app.add_url_rule("/graphql", view_func=view_func)
 def index():
     return "GraphQL server is listening on /graphql"
 
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
 
 if __name__ == "__main__":
     app.run()
