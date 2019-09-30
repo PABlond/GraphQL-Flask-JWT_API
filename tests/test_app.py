@@ -12,7 +12,7 @@ def randomString(stringLength=10):
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
-email = randomString(50)
+email = randomString(50) + "@gmail.com"
 
 
 def test_root_endpoint():
@@ -103,4 +103,35 @@ def test_confirmResend_already_confirmed():
 def test_confirmResend_success():
     r = signup(email)
     assert r.status_code == 200
+    delete_user(email)
+
+
+def test_userConfirm_success():
+    signup(email)
+    user = Users.find_one({"email": email})
+    uniqid = user['is_check']['id']
+    query = " {userConfirm(email: \"" + email + "\", uniqid: \"" + uniqid + "\")}"
+    r = requests.get("{}/graphql?query={}".format(url,
+                                                  urllib.parse.quote(query)))
+    assert r.status_code == 200
+    assert r.json()['data']['userConfirm'] == True
+    delete_user(email)
+
+
+def test_userConfirm_not_found():
+    query = " {userConfirm(email: \"" + email + "\", uniqid: \"random\")}"
+    r = requests.get("{}/graphql?query={}".format(url,
+                                                  urllib.parse.quote(query)))
+    assert len(r.json()['errors']) == 1
+    assert r.json()['errors'][0]['message'] == "User not found"
+
+
+def test_userConfirm_success():
+    signup(email)
+    uniqid = "randomUniqid"
+    query = " {userConfirm(email: \"" + email + "\", uniqid: \"" + uniqid + "\")}"
+    r = requests.get("{}/graphql?query={}".format(url,
+                                                  urllib.parse.quote(query)))
+    assert len(r.json()['errors']) == 1
+    assert r.json()['errors'][0]['message'] == "Link is not correct"
     delete_user(email)
